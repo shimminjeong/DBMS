@@ -37,6 +37,7 @@ public class calmain {
 		stmt = conn.createStatement();
 		rs = stmt.executeQuery("SELECT EMPNO, ENAME, JOB, SAL, NVL(COMM,0) AS COMM FROM EMP");
 
+		System.out.println("1");
 //		empInfo에 넣기
 		while (rs.next()) {
 			empInfo.add(new Emp(Integer.parseInt(rs.getString("EMPNO")), rs.getString("ENAME"), rs.getString("JOB"),
@@ -45,13 +46,18 @@ public class calmain {
 
 //		customer테이블의 매니저 번호(ACCOUNT_MGR) 조회
 		stmt = conn.createStatement();
+		
+//		setFetchsize를 10, 100, 1000, 10000으로 조정
+		stmt.setFetchSize(100);
 		rs = stmt.executeQuery("SELECT ACCOUNT_MGR FROM CUSTOMER");
+		
 
-//		mgrno별로 관리하는 고객 수 count
+//		ACCOUNT_MGR별로 관리하는 고객 수 count
 		Map<Integer, Integer> customerMap = new HashMap<>();
 
-//		account_mgr별로 고객 수 count
+//		ACCOUNT_MGR(mgrno)별로 고객 수 count(cuscnt)
 		while (rs.next()) {
+			
 			Integer mgrno = rs.getInt("ACCOUNT_MGR");
 			Integer cuscnt = customerMap.get(mgrno);
 
