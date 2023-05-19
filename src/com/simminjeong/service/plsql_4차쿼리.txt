@@ -1,0 +1,67 @@
+DECLARE
+--    EMP 커서 정의
+    CURSOR CUR_EMP IS 
+                    SELECT EMPNO,ENAME,JOB,SAL,NVL(COMM,0) AS COMM FROM EMP;
+--    CUSTOMER 커서 정의
+    CURSOR CUR_CUSTOMER IS 
+            SELECT ACCOUNT_MGR FROM CUSTOMER;
+    
+--    multiple row를 처리할떄 배열처럼 접근하기 위해 table 타입으로 정의
+    TYPE T_CUSTOMER IS TABLE OF CUSTOMER.ACCOUNT_MGR%TYPE;
+    TAB_CUSTOMER T_CUSTOMER;
+            
+--    ACCOUNT_MGR별로 관리하는 고객수 COUNT 하기 위한 SCALAR TYPE 변수 선언
+    CUSCNT NUMBER;
+--    EMP COMM의 DATA TYPE, LENGTH 참조하여 변수 선언 
+    V_COMM EMP.COMM%TYPE;
+    
+BEGIN
+--    EMP 테이블 가져오기
+    FOR R_CUR_EMP IN CUR_EMP
+    LOOP
+        CUSCNT:=0;
+--        커서 OPEN
+        OPEN CUR_CUSTOMER;
+        LOOP
+--            BULK BINDING을 통해 LIMIT 1000으로 1000개씩 FETCH
+            FETCH CUR_CUSTOMER BULK COLLECT INTO TAB_CUSTOMER LIMIT 1000;
+--            CUSTOMER의 ACCOUNT_MGR를 FOR문으로 돌면서 EMP의 EMPNO와 같은 경우의 수 COUNT 
+            FOR I IN 1..TAB_CUSTOMER.COUNT
+            LOOP
+                IF TAB_CUSTOMER(I) = R_CUR_EMP.EMPNO THEN
+                    CUSCNT:=CUSCNT+1;
+                END IF;
+            END LOOP;
+--            CUR_CUSTOMER이 더이상 없으면 LOOP문 종료
+            EXIT WHEN CUR_CUSTOMER%NOTFOUND;
+        END LOOP;    
+--        커서 CLOSE
+        CLOSE CUR_CUSTOMER;
+        
+--        조건에 맞게 COMM 계산
+        IF R_CUR_EMP.JOB IN ('ANALYST','PRESIDENT') THEN
+            V_COMM:=0;
+        ELSIF CUSCNT>=100000 THEN
+            V_COMM:=2000;
+        ELSE
+            V_COMM:=1000;
+        END IF;
+
+--        BONUS테이블에 INSERT        
+        INSERT INTO BONUS(ENAME,JOB,SAL,COMM)
+        VALUES(R_CUR_EMP.ENAME,R_CUR_EMP.JOB,R_CUR_EMP.SAL,R_CUR_EMP.COMM+V_COMM); 
+    END LOOP;
+        
+
+--    트랜잭션 COMMIT
+    COMMIT;
+
+--    예외처리
+    EXCEPTION
+                WHEN OTHERS THEN 
+                ROLLBACK;
+                DBMS_OUTPUT.PUT_LINE('ERROR: '||SQLERRM);     
+END;
+/
+
+SELECT * FROM BONUS;
