@@ -1,4 +1,4 @@
-package com.simminjeong.procedure.service;
+package com.simminjeong.service;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -9,11 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.simminjeong.procedure.entity.Bonus;
-import com.simminjeong.procedure.entity.Emp;
-import com.simminjeong.procedure.util.JDBCUtil;
+import com.simminjeong.entity.Bonus;
+import com.simminjeong.entity.Emp;
+import com.simminjeong.util.JDBCUtil;
 
-public class statementFetchMain2 {
+public class statementMain1 {
 
 	public static void main(String[] args) throws SQLException {
 
@@ -46,6 +46,9 @@ public class statementFetchMain2 {
 
 //		customer테이블의 매니저 번호(ACCOUNT_MGR) 조회
 		stmt = conn.createStatement();
+
+//		setFetchsize를 10, 100, 1000, 10000으로 조정
+		stmt.setFetchSize(100);
 		rs = stmt.executeQuery("SELECT ACCOUNT_MGR FROM CUSTOMER");
 
 //		ACCOUNT_MGR별로 관리하는 고객 수 count

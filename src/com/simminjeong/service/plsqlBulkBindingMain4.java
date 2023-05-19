@@ -1,4 +1,4 @@
-package com.simminjeong.procedure.service;
+package com.simminjeong.service;
 
 import java.sql.Array;
 import java.sql.CallableStatement;
@@ -6,7 +6,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import com.simminjeong.procedure.util.JDBCUtil;
+import com.simminjeong.util.JDBCUtil;
 
 public class plsqlBulkBindingMain4 {
 

@@ -1,4 +1,4 @@
-package com.simminjeong.procedure.util;
+package com.simminjeong.util;
 
 
 import java.sql.Connection;

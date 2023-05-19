@@ -1,4 +1,4 @@
-package com.simminjeong.procedure.entity;
+package com.simminjeong.entity;
 
 import java.util.Objects;
 
